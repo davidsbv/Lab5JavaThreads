@@ -33,7 +33,7 @@
             <column name="price" type="DOUBLE"/>
             <column name="year" type="INT"/>
             <column name="description" type="VARCHAR(255)"/>
-            <column name="colour" type="VARCHAR(255)"/>
+            <column name="color" type="VARCHAR(255)"/>
             <column name="fuel_type" type="VARCHAR(255)"/>
             <column name="num_doors" type="INT"/>
         </createTable>

@@ -26,7 +26,7 @@ public class CarEntity {
     private Double price;
     private Integer year;
     private String description;
-    private String colour;
+    private String color;
     @Column(name = "fuel_type")
     private String fuelType;
     @Column(name = "num_doors")
