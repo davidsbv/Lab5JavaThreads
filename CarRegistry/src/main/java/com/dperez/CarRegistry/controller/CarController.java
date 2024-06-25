@@ -47,15 +47,18 @@ public class CarController {
         }
     }
 
-//    @PostMapping("add-cars")
-//    public CompletableFuture<List<CarDTO>> addCars(@RequestBody List<CarDTO> carDTOs){
-//
-//        // Convierte la lista de CarDTO a Car y llama al método addCars del servicio
-//        List<Car> cars = carDTOs.stream().map(CarDTOMapper.INSTANCE::carDTOToCar).collect(Collectors.toList());
-//        return carService.addCars(cars).thenApply(addedCars -> {
-//            List<CarDTO> addedCarDTOs =
-//        })
-//    }
+    @PostMapping("add-cars")
+    public CompletableFuture<ResponseEntity<?>> addCars(@RequestBody List<CarDTO> carDTOs){
+
+        // Convierte la lista de CarDTO a Car y llama al método addCars del servicio
+        // Después pasa cada objeto car del stream un objeto CarDTOAndBrand y lo devuelve
+        List<Car> cars = carDTOs.stream().map(CarDTOMapper.INSTANCE::carDTOToCar).collect(Collectors.toList());
+        return carService.addCars(cars).thenApply(addedCars -> {
+            List<CarDTOAndBrand> addedCarDTOsAndBrand = addedCars.stream()
+                    .map(CarDTOAndBrandMapper.INSTANCE::carToCarDTOAndBrand).toList();
+            return ResponseEntity.ok(addedCarDTOsAndBrand);
+        });
+    }
 
     @GetMapping("get-car/{id}")
     public ResponseEntity<?> getCarById(@PathVariable Integer id){

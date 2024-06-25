@@ -1,6 +1,5 @@
 package com.dperez.CarRegistry.service.model;
 
-import com.dperez.CarRegistry.repository.entity.BrandEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
