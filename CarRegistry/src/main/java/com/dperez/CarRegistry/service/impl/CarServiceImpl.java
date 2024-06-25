@@ -67,37 +67,33 @@ import java.util.stream.Collectors;
 
     @Async("taskExecutor")
     @Override
-    public CompletableFuture<List<Car>> addCars(List<Car> cars) {
-//
-//        // Verificar si la id existe y si la marca está en la base de datos
-//        List<Car> addedCars = cars.stream().map(car -> {
-//            if((car.getId() != null) && (carRepository.existsById(car.getId()))){
-//
-//                throw new IllegalArgumentException("The Id " + car.getId() + " already exists");
-//            }
-//
-//            Optional<BrandEntity> brandEntityOptional = brandRepository.findByNameIgnoreCase(car.getBrand());
-//
-//            if(!brandEntityOptional.isPresent()){
-//
-//                throw new IllegalArgumentException("Brand " + car.getBrand() + " does not exist");
-//            }
-//
-//            // Toma la BrandEntity, se le asigna a cada CarEntity que se ha trnsformado previamente de Car.
-//            BrandEntity brandEntity = brandEntityOptional.get();
-//            CarEntity carEntity = CarEntityMapper.INSTANCE.carToCarEntity(car);
-//            carEntity.setBrand((brandEntity));
-//
-//            // Se añade el CarEntity validado
-//            CarEntity savedCarEntity = carRepository.save(carEntity);
-//
-//            // Se realiza la conversión y se devuelve el objeto de dominio Car
-//            return CarEntityMapper.INSTANCE.carEntityToCar(savedCarEntity);
-//
-//        }).collect(Collectors.toList());
-//
-//        return CompletableFuture.completedFuture(addedCars);
-        return null;
+    public CompletableFuture<List<Car>> addCars(List<Car> cars) throws IllegalArgumentException {
+
+        // Verificar si la id existe y si la marca está en la base de datos
+        List<Car> addedCars = cars.stream().map(car -> {
+            if ((car.getId() != null) && carRepository.existsById(car.getId())){
+               throw new IllegalArgumentException("The Id " + car.getId() + " already exists");
+            }
+
+            Optional<BrandEntity> brandEntityOptional = brandRepository.findByNameIgnoreCase(car.getBrand().getName());
+
+            if (brandEntityOptional.isEmpty()){
+                throw new IllegalArgumentException("Brand " + car.getBrand().getName() + " does not exist");
+            }
+
+            // Toma la BrandEntity, se le asigna a cada CarEntity que se ha transformado previamente de Car
+            BrandEntity brandEntity = brandEntityOptional.get();
+            CarEntity carEntity = CarEntityMapper.INSTANCE.carToCarEntity(car);
+            carEntity.setBrand(brandEntity);
+
+            // Se guarda el CarEntity con los datos validados, en savedCar para retornarlos al stream como Car
+            CarEntity savedCarEntity = carRepository.save(carEntity);
+
+            return CarEntityMapper.INSTANCE.carEntityToCar(savedCarEntity);
+        }).toList();
+
+        // Se devulven los coches guardados
+        return CompletableFuture.completedFuture(addedCars);
     }
 
 
