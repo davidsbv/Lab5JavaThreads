@@ -18,7 +18,7 @@ public class CarDTOAndBrand {
     private Double price;
     private Integer year;
     private String description;
-    private String colour;
+    private String color;
     private String fuelType;
     private Integer numDoors;
 

@@ -17,3 +17,4 @@ public interface CarDTOMapper {
     @Mapping(source = "brand", target = "brand.name")
     Car carDTOToCar(CarDTO carDTO);
 }
+

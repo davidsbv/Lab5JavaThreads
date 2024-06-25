@@ -11,7 +11,7 @@ public interface CarDTOAndBrandMapper {
 
     CarDTOAndBrandMapper INSTANCE = Mappers.getMapper(CarDTOAndBrandMapper.class);
 
-   // @Mapping(source = "brand", target = "brand")
+    // @Mapping(source = "brand", target = "brand")
     CarDTOAndBrand carToCarDTOAndBrand(Car car);
 
     // @Mapping(source = "brand", target = "brand")
