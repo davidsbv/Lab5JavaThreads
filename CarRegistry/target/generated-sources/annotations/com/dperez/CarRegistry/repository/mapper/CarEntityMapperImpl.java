@@ -2,12 +2,13 @@ package com.dperez.CarRegistry.repository.mapper;
 
 import com.dperez.CarRegistry.repository.entity.BrandEntity;
 import com.dperez.CarRegistry.repository.entity.CarEntity;
+import com.dperez.CarRegistry.service.model.Brand;
 import com.dperez.CarRegistry.service.model.Car;
 import javax.annotation.processing.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-06-20T10:19:47+0200",
+    date = "2024-06-25T10:15:42+0200",
     comments = "version: 1.4.2.Final, compiler: javac, environment: Java 17.0.8 (Oracle Corporation)"
 )
 public class CarEntityMapperImpl implements CarEntityMapper {
@@ -20,8 +21,8 @@ public class CarEntityMapperImpl implements CarEntityMapper {
 
         Car car = new Car();
 
-        car.setBrand( carEntityBrandName( carEntity ) );
         car.setId( carEntity.getId() );
+        car.setBrand( brandEntityToBrand( carEntity.getBrand() ) );
         car.setModel( carEntity.getModel() );
         car.setMileage( carEntity.getMileage() );
         car.setPrice( carEntity.getPrice() );
@@ -42,8 +43,8 @@ public class CarEntityMapperImpl implements CarEntityMapper {
 
         CarEntity carEntity = new CarEntity();
 
-        carEntity.setBrand( carToBrandEntity( car ) );
         carEntity.setId( car.getId() );
+        carEntity.setBrand( brandToBrandEntity( car.getBrand() ) );
         carEntity.setModel( car.getModel() );
         carEntity.setMileage( car.getMileage() );
         carEntity.setPrice( car.getPrice() );
@@ -56,29 +57,32 @@ public class CarEntityMapperImpl implements CarEntityMapper {
         return carEntity;
     }
 
-    private String carEntityBrandName(CarEntity carEntity) {
-        if ( carEntity == null ) {
+    protected Brand brandEntityToBrand(BrandEntity brandEntity) {
+        if ( brandEntity == null ) {
             return null;
         }
-        BrandEntity brand = carEntity.getBrand();
-        if ( brand == null ) {
-            return null;
-        }
-        String name = brand.getName();
-        if ( name == null ) {
-            return null;
-        }
-        return name;
+
+        Brand brand = new Brand();
+
+        brand.setId( brandEntity.getId() );
+        brand.setName( brandEntity.getName() );
+        brand.setWarranty( brandEntity.getWarranty() );
+        brand.setCountry( brandEntity.getCountry() );
+
+        return brand;
     }
 
-    protected BrandEntity carToBrandEntity(Car car) {
-        if ( car == null ) {
+    protected BrandEntity brandToBrandEntity(Brand brand) {
+        if ( brand == null ) {
             return null;
         }
 
         BrandEntity brandEntity = new BrandEntity();
 
-        brandEntity.setName( car.getBrand() );
+        brandEntity.setId( brand.getId() );
+        brandEntity.setName( brand.getName() );
+        brandEntity.setWarranty( brand.getWarranty() );
+        brandEntity.setCountry( brand.getCountry() );
 
         return brandEntity;
     }

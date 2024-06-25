@@ -4,21 +4,25 @@ import com.dperez.CarRegistry.repository.BrandRepository;
 import com.dperez.CarRegistry.repository.CarRepository;
 import com.dperez.CarRegistry.repository.entity.BrandEntity;
 import com.dperez.CarRegistry.repository.entity.CarEntity;
+import com.dperez.CarRegistry.repository.mapper.BrandEntityMapper;
 import com.dperez.CarRegistry.repository.mapper.CarEntityMapper;
 import com.dperez.CarRegistry.service.CarService;
+import com.dperez.CarRegistry.service.model.Brand;
 import com.dperez.CarRegistry.service.model.Car;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class CarServiceImpl implements CarService {
+ public class CarServiceImpl implements CarService {
 
     @Autowired
     private CarRepository carRepository;
@@ -37,18 +41,22 @@ public class CarServiceImpl implements CarService {
         }
 
         // Verificar si la marca existe
-        Optional<BrandEntity> brandEntityOptional = brandRepository.findByNameIgnoreCase(car.getBrand());
+        Optional<BrandEntity> brandEntityOptional = brandRepository.findByNameIgnoreCase(car.getBrand().getName());
 
-        if(!brandEntityOptional.isPresent()){
-            throw new IllegalArgumentException("Brand " + car.getBrand() + " does not exist");
+        if(brandEntityOptional.isEmpty()){
+            throw new IllegalArgumentException("Brand " + car.getBrand().getName() + " does not exist");
         }
 
-        // Obtener la BrandEntity existente
+        // Obtener la BrandEntity existente y pasar a Brand
         BrandEntity brandEntity = brandEntityOptional.get();
+        Brand brand = BrandEntityMapper.INSTANCE.brandEntityToBrand(brandEntity);
 
-        // Asociar la BrandEntitiy existente a la CarEntity
+        // Asociar la BrandEntitiy existente al car
+        car.setBrand(brand);
+
+        // Se pasa car a carEntity para guardar
         CarEntity carEntity = CarEntityMapper.INSTANCE.carToCarEntity(car);
-        carEntity.setBrand((brandEntity)); // Se asocia la BrandEntity existente
+       // carEntity.setBrand((brand)); // Se asocia la brand existente
 
         // Se guarda la CarEntity en la base de datos
         CarEntity savedCarEntity = carRepository.save(carEntity);
@@ -56,6 +64,42 @@ public class CarServiceImpl implements CarService {
         // Se devuelve el coche guardado como modelo de dominio
         return CarEntityMapper.INSTANCE.carEntityToCar(savedCarEntity);
     }
+
+    @Async("taskExecutor")
+    @Override
+    public CompletableFuture<List<Car>> addCars(List<Car> cars) {
+//
+//        // Verificar si la id existe y si la marca está en la base de datos
+//        List<Car> addedCars = cars.stream().map(car -> {
+//            if((car.getId() != null) && (carRepository.existsById(car.getId()))){
+//
+//                throw new IllegalArgumentException("The Id " + car.getId() + " already exists");
+//            }
+//
+//            Optional<BrandEntity> brandEntityOptional = brandRepository.findByNameIgnoreCase(car.getBrand());
+//
+//            if(!brandEntityOptional.isPresent()){
+//
+//                throw new IllegalArgumentException("Brand " + car.getBrand() + " does not exist");
+//            }
+//
+//            // Toma la BrandEntity, se le asigna a cada CarEntity que se ha trnsformado previamente de Car.
+//            BrandEntity brandEntity = brandEntityOptional.get();
+//            CarEntity carEntity = CarEntityMapper.INSTANCE.carToCarEntity(car);
+//            carEntity.setBrand((brandEntity));
+//
+//            // Se añade el CarEntity validado
+//            CarEntity savedCarEntity = carRepository.save(carEntity);
+//
+//            // Se realiza la conversión y se devuelve el objeto de dominio Car
+//            return CarEntityMapper.INSTANCE.carEntityToCar(savedCarEntity);
+//
+//        }).collect(Collectors.toList());
+//
+//        return CompletableFuture.completedFuture(addedCars);
+        return null;
+    }
+
 
     @Override
     public Car getCarById(Integer id) {
@@ -68,11 +112,12 @@ public class CarServiceImpl implements CarService {
         return carEntityOptional.map(CarEntityMapper.INSTANCE::carEntityToCar).orElse(null);
     }
 
+
     @Override
     public Car updateCarById(Integer id, Car car) throws IllegalArgumentException {
 
         // Verifica si la Marca del objeto Car existe
-        Optional<BrandEntity> brandEntityOptional = brandRepository.findByNameIgnoreCase(car.getBrand());
+        Optional<BrandEntity> brandEntityOptional = brandRepository.findByNameIgnoreCase(car.getBrand().getName());
 
         if (brandEntityOptional.isEmpty()){
             log.error("Unknown id");
@@ -101,6 +146,13 @@ public class CarServiceImpl implements CarService {
 
     }
 
+
+    @Override
+    public CompletableFuture<List<Car>> updateCars(List<Car> cars) {
+        return null;
+    }
+
+
     @Override
     public void deleteCarById(Integer id) throws IllegalArgumentException {
 
@@ -112,6 +164,7 @@ public class CarServiceImpl implements CarService {
             throw new IllegalArgumentException("Car not found with Id: " + id);
         }
     }
+
 
     @Override
     public List<Car> getAllCars() {
