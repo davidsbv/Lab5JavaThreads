@@ -11,8 +11,9 @@ public interface CarEntityMapper {
 
     CarEntityMapper INSTANCE = Mappers.getMapper(CarEntityMapper.class);
 
-    @Mapping(source = "brand.name", target = "brand")
+   // @Mapping(source = "brand", target = "brand")
     Car carEntityToCar(CarEntity carEntity);
-    @Mapping(source = "brand", target = "brand.name")
+
+   // @Mapping(source = "brand", target = "brandEntity")
     CarEntity carToCarEntity(Car car);
 }

@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CarDTO {
+
     private Integer id;
     private String brand;
     private String model;
@@ -21,4 +22,5 @@ public class CarDTO {
     private String colour;
     private String fuelType;
     private Integer numDoors;
+
 }

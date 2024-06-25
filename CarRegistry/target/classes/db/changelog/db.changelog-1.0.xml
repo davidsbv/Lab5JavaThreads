@@ -20,7 +20,7 @@
 
     <changeSet id="2" author="davidsbv">
         <createTable tableName="car">
-            <column name="id" type="INT" autoIncrement="false">
+            <column name="id" type="INT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="brand_id" type="INT">

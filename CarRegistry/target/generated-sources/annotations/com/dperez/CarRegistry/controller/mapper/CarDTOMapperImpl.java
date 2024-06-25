@@ -1,14 +1,13 @@
 package com.dperez.CarRegistry.controller.mapper;
 
 import com.dperez.CarRegistry.controller.dtos.CarDTO;
-import com.dperez.CarRegistry.controller.dtos.CarDTO.CarDTOBuilder;
+import com.dperez.CarRegistry.service.model.Brand;
 import com.dperez.CarRegistry.service.model.Car;
-import com.dperez.CarRegistry.service.model.Car.CarBuilder;
 import javax.annotation.processing.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-06-20T11:46:34+0200",
+    date = "2024-06-25T10:15:42+0200",
     comments = "version: 1.4.2.Final, compiler: javac, environment: Java 17.0.8 (Oracle Corporation)"
 )
 public class CarDTOMapperImpl implements CarDTOMapper {
@@ -19,20 +18,20 @@ public class CarDTOMapperImpl implements CarDTOMapper {
             return null;
         }
 
-        CarDTOBuilder carDTO = CarDTO.builder();
+        CarDTO carDTO = new CarDTO();
 
-        carDTO.id( car.getId() );
-        carDTO.brand( car.getBrand() );
-        carDTO.model( car.getModel() );
-        carDTO.mileage( car.getMileage() );
-        carDTO.price( car.getPrice() );
-        carDTO.year( car.getYear() );
-        carDTO.description( car.getDescription() );
-        carDTO.colour( car.getColour() );
-        carDTO.fuelType( car.getFuelType() );
-        carDTO.numDoors( car.getNumDoors() );
+        carDTO.setBrand( carBrandName( car ) );
+        carDTO.setId( car.getId() );
+        carDTO.setModel( car.getModel() );
+        carDTO.setMileage( car.getMileage() );
+        carDTO.setPrice( car.getPrice() );
+        carDTO.setYear( car.getYear() );
+        carDTO.setDescription( car.getDescription() );
+        carDTO.setColour( car.getColour() );
+        carDTO.setFuelType( car.getFuelType() );
+        carDTO.setNumDoors( car.getNumDoors() );
 
-        return carDTO.build();
+        return carDTO;
     }
 
     @Override
@@ -41,19 +40,46 @@ public class CarDTOMapperImpl implements CarDTOMapper {
             return null;
         }
 
-        CarBuilder car = Car.builder();
+        Car car = new Car();
 
-        car.id( carDTO.getId() );
-        car.brand( carDTO.getBrand() );
-        car.model( carDTO.getModel() );
-        car.mileage( carDTO.getMileage() );
-        car.price( carDTO.getPrice() );
-        car.year( carDTO.getYear() );
-        car.description( carDTO.getDescription() );
-        car.colour( carDTO.getColour() );
-        car.fuelType( carDTO.getFuelType() );
-        car.numDoors( carDTO.getNumDoors() );
+        car.setBrand( carDTOToBrand( carDTO ) );
+        car.setId( carDTO.getId() );
+        car.setModel( carDTO.getModel() );
+        car.setMileage( carDTO.getMileage() );
+        car.setPrice( carDTO.getPrice() );
+        car.setYear( carDTO.getYear() );
+        car.setDescription( carDTO.getDescription() );
+        car.setColour( carDTO.getColour() );
+        car.setFuelType( carDTO.getFuelType() );
+        car.setNumDoors( carDTO.getNumDoors() );
 
-        return car.build();
+        return car;
+    }
+
+    private String carBrandName(Car car) {
+        if ( car == null ) {
+            return null;
+        }
+        Brand brand = car.getBrand();
+        if ( brand == null ) {
+            return null;
+        }
+        String name = brand.getName();
+        if ( name == null ) {
+            return null;
+        }
+        return name;
+    }
+
+    protected Brand carDTOToBrand(CarDTO carDTO) {
+        if ( carDTO == null ) {
+            return null;
+        }
+
+        Brand brand = new Brand();
+
+        brand.setName( carDTO.getBrand() );
+
+        return brand;
     }
 }
