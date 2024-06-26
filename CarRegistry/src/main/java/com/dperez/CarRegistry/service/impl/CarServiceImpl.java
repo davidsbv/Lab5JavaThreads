@@ -66,7 +66,7 @@ import java.util.stream.Collectors;
 
     @Async("taskExecutor")
     @Override
-    public CompletableFuture<List<Car>> addCars(List<Car> cars) throws IllegalArgumentException {
+    public CompletableFuture<List<Car>> addBunchCars(List<Car> cars) throws IllegalArgumentException {
 
         // Verificar si la id existe y si la marca está en la base de datos
         List<Car> addedCars = cars.stream().map(car -> {
@@ -141,10 +141,41 @@ import java.util.stream.Collectors;
 
     }
 
-
+    @Async("taskExecutor")
     @Override
-    public CompletableFuture<List<Car>> updateCars(List<Car> cars) {
-        return null;
+    public CompletableFuture<List<Car>> updateBunchCars(List<Car> cars) throws IllegalArgumentException {
+        // Se guardan los Car actualizados haciendo las comprobaciones de marca e id existentes.
+        List<Car> updatedCars = cars.stream().map(car -> {
+
+            // Pasar de Brand a BrandEntity y comprobar que está dada de alta en la base de datos
+            BrandEntity brandEntity = BrandEntityMapper.INSTANCE.brandToBrandEntity(car.getBrand());
+            Optional<BrandEntity> brandEntityOptional = brandRepository.findByNameIgnoreCase(brandEntity.getName());
+
+            // Comprobación de Brand
+            if (brandEntityOptional.isEmpty()){
+                throw new IllegalArgumentException("Brand: " + brandEntity.getName() + " not yet registred");
+            }
+            // Comprobación de id
+            if ((car.getId() == null) || (!carRepository.existsById(car.getId()))){
+                throw new IllegalArgumentException("Id: " + car.getId() + " does not exist");
+            }
+
+            // Si existen id y brand de cada car se toman los datos de Brand de la base de datos
+            brandEntity = brandEntityOptional.get();
+
+            // Pasamos los Car a CarEntity
+            CarEntity carEntity = CarEntityMapper.INSTANCE.carToCarEntity(car);
+
+            // Se setea BrandEntity para su CarEntity
+            carEntity.setBrand(brandEntity);
+
+            // Se actualizan los datos
+            CarEntity updatedCarEntity = carRepository.save(carEntity);
+
+            // Se devuelve el Car actualizado
+            return CarEntityMapper.INSTANCE.carEntityToCar(updatedCarEntity);
+        }).toList();
+        return CompletableFuture.completedFuture(updatedCars);
     }
 
 
@@ -160,12 +191,13 @@ import java.util.stream.Collectors;
         }
     }
 
-
+    @Async("taskExecutor")
     @Override
-    public List<Car> getAllCars() {
+    public CompletableFuture<List<Car>> getAllCars() {
 
         // Se obtienen en una lista todos los objetos de tipo CarEntity y se mapean a tipo Car
-        return carRepository.findAll().stream().map(CarEntityMapper.INSTANCE::carEntityToCar)
-                .collect(Collectors.toList());
+        List<Car> allCars = carRepository.findAll().stream().map(CarEntityMapper.INSTANCE::carEntityToCar)
+                .toList();
+        return CompletableFuture.completedFuture(allCars);
     }
 }
