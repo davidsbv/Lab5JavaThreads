@@ -62,9 +62,9 @@ public class CarController {
                 return ResponseEntity.ok(addedCarDTOsAndBrand);
             });
         }  catch (IllegalArgumentException e) {
-            // Error por Id ya existente.
+            // Error en la id o marca
             log.error(e.getMessage());
-            return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage()));
+            return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()));
 
         } catch (Exception e){
             log.error("Error while adding new car");
@@ -104,7 +104,7 @@ public class CarController {
 
         } catch (IllegalArgumentException e) {  // Error en la id pasada
             log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 
         } catch (Exception e){
             log.error("Error while updating car");
@@ -114,27 +114,27 @@ public class CarController {
     }
 
 
-@PutMapping("update-bunch")
-    public CompletableFuture<ResponseEntity<?>> updateBunch(@RequestBody List<CarDTO> carDTOs){
+    @PutMapping("update-bunch")
+        public CompletableFuture<ResponseEntity<?>> updateBunch(@RequestBody List<CarDTO> carDTOs){
 
-    try {
-        List<Car> cars = carDTOs.stream().map(CarDTOMapper.INSTANCE::carDTOToCar).toList();
-        return carService.updateBunchCars(cars).thenApply(updatedCars -> {
-            List<CarDTOAndBrand> updatedCarDTOAndBrand = updatedCars.stream()
-                    .map(CarDTOAndBrandMapper.INSTANCE::carToCarDTOAndBrand).toList();
+        try {
+            List<Car> cars = carDTOs.stream().map(CarDTOMapper.INSTANCE::carDTOToCar).toList();
+            return carService.updateBunchCars(cars).thenApply(updatedCars -> {
+                List<CarDTOAndBrand> updatedCarDTOAndBrand = updatedCars.stream()
+                        .map(CarDTOAndBrandMapper.INSTANCE::carToCarDTOAndBrand).toList();
 
-            log.info("Updating several cars");
-            return ResponseEntity.ok(updatedCarDTOAndBrand);
-        });
-    }catch (IllegalArgumentException e) {
-        log.error(e.getMessage());
-        return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage()));
+                log.info("Updating several cars");
+                return ResponseEntity.ok(updatedCarDTOAndBrand);
+            });
+        }catch (IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()));
 
-    } catch (Exception e){
-        log.error("Error while updating car");
-        return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+        } catch (Exception e){
+            log.error("Error while updating car");
+            return CompletableFuture.completedFuture(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+        }
     }
-}
 
     @DeleteMapping("delete-car/{id}")
     public ResponseEntity<?> deleteCarById(@PathVariable Integer id){

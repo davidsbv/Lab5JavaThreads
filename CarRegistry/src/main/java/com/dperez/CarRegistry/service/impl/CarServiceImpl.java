@@ -67,13 +67,14 @@ import java.util.stream.Collectors;
     @Async("taskExecutor")
     @Override
     public CompletableFuture<List<Car>> addBunchCars(List<Car> cars) throws IllegalArgumentException {
+        long starTime = System.currentTimeMillis();
 
         // Verificar si la id existe y si la marca está en la base de datos
         List<Car> addedCars = cars.stream().map(car -> {
             if ((car.getId() != null) && carRepository.existsById(car.getId())){
                throw new IllegalArgumentException("The Id " + car.getId() + " already exists");
             }
-
+            // Se obtienen las marcas a de los coches a actualizar
             Optional<BrandEntity> brandEntityOptional = brandRepository.findByNameIgnoreCase(car.getBrand().getName());
 
             if (brandEntityOptional.isEmpty()){
@@ -90,6 +91,9 @@ import java.util.stream.Collectors;
 
             return CarEntityMapper.INSTANCE.carEntityToCar(savedCarEntity);
         }).toList();
+
+        long endTime = System.currentTimeMillis();
+        log.info("Total time: " + (endTime-starTime));
 
         // Se devulven los coches guardados
         return CompletableFuture.completedFuture(addedCars);
@@ -144,6 +148,8 @@ import java.util.stream.Collectors;
     @Async("taskExecutor")
     @Override
     public CompletableFuture<List<Car>> updateBunchCars(List<Car> cars) throws IllegalArgumentException {
+        long starTime = System.currentTimeMillis();
+
         // Se guardan los Car actualizados haciendo las comprobaciones de marca e id existentes.
         List<Car> updatedCars = cars.stream().map(car -> {
 
@@ -175,6 +181,10 @@ import java.util.stream.Collectors;
             // Se devuelve el Car actualizado
             return CarEntityMapper.INSTANCE.carEntityToCar(updatedCarEntity);
         }).toList();
+
+        long endTime = System.currentTimeMillis();
+        log.info("Total time: " + (endTime-starTime));
+
         return CompletableFuture.completedFuture(updatedCars);
     }
 
@@ -194,10 +204,15 @@ import java.util.stream.Collectors;
     @Async("taskExecutor")
     @Override
     public CompletableFuture<List<Car>> getAllCars() {
+        long starTime = System.currentTimeMillis();
 
         // Se obtienen en una lista todos los objetos de tipo CarEntity y se mapean a tipo Car
         List<Car> allCars = carRepository.findAll().stream().map(CarEntityMapper.INSTANCE::carEntityToCar)
                 .toList();
+
+        long endTime = System.currentTimeMillis();
+        log.info("Total time: " + (endTime-starTime));
+
         return CompletableFuture.completedFuture(allCars);
     }
 }
