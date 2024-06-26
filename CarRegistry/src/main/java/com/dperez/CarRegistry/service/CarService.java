@@ -10,10 +10,10 @@ import java.util.concurrent.CompletableFuture;
 public interface CarService {
 
     Car addCar(Car car) throws DataIntegrityViolationException;
-    CompletableFuture<List<Car>> addCars(List<Car> cars);
+    CompletableFuture<List<Car>> addBunchCars(List<Car> cars);
     Car getCarById(Integer id);
     Car updateCarById(Integer id, Car car);
-    CompletableFuture<List<Car>> updateCars(List<Car> cars);
+    CompletableFuture<List<Car>> updateBunchCars(List<Car> cars);
     void deleteCarById(Integer id);
-    List<Car> getAllCars();
+    CompletableFuture<List<Car>> getAllCars() throws IllegalArgumentException;
 }
