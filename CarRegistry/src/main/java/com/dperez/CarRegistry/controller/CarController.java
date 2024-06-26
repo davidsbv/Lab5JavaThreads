@@ -25,26 +25,54 @@ public class CarController {
     private CarService carService;
 
     @PostMapping("add-car")
-    public ResponseEntity<?> addCar(@RequestBody CarDTO carDTO){
+    public CompletableFuture<?> addCar(@RequestBody CarDTO carDTO){
 
-        try {
-            // Se convierte carDTO a Car y se utiliza en la llmada al método addCar.
-            // Cuando se guarda se devuelve en newCarDTO  y se muestra la respuesta
-            Car car = CarDTOMapper.INSTANCE.carDTOToCar(carDTO);
-            Car newCar = carService.addCar(car);
-            CarDTOAndBrand newCarDTOAndBrand = CarDTOAndBrandMapper.INSTANCE.carToCarDTOAndBrand(newCar);
-            log.info("New Car added");
-            return ResponseEntity.ok(newCarDTOAndBrand);
+        // Se ejecuta de manera asíncrónica la conversión de carDTO a Car (en hilo separado)
+        return CompletableFuture.supplyAsync(() -> CarDTOMapper.INSTANCE.carDTOToCar(carDTO))
 
-        } catch (IllegalArgumentException e) {
-            // Error por Id ya existente.
-            log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+                // Toma el Car convertido y llama al carService.addCar(car). Devolverá un CompletableFuture<Car>
+                .thenCompose(car -> carService.addCar(car))
 
-        } catch (Exception e){
-            log.error("Error while adding new car");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+                // Se transforma el Car añadido a CarDTOAndBrand
+                .thenApply(CarDTOAndBrandMapper.INSTANCE::carToCarDTOAndBrand)
+
+                // Se crea una respuesta ResponseEntity con el cuerpo de newCarDTOAndBran
+                .thenApply(newCarDTOAndBran -> {
+                    log.info("New Car added");
+                    return ResponseEntity.ok(newCarDTOAndBran);
+                })
+
+                // Manejo de excepciones
+                .exceptionally(throwable -> {
+                    if(throwable.getCause() instanceof IllegalArgumentException){
+                        log.error(throwable.getMessage(), throwable);
+                        return ResponseEntity.status(HttpStatus.CONFLICT).build();
+                    } else {
+                        log.error("Error while adding new car", throwable);
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                    }
+                });
+//        try {
+//            // Se convierte carDTO a Car y se utiliza en la llmada al método addCar.
+//            // Cuando se guarda se devuelve en newCarDTO  y se muestra la respuesta
+//            Car car = CarDTOMapper.INSTANCE.carDTOToCar(carDTO);
+//
+//            Car newCar = carService.addCar(car);
+//            CarDTOAndBrand newCarDTOAndBrand = CarDTOAndBrandMapper.INSTANCE.carToCarDTOAndBrand(newCar);
+//            log.info("New Car added");
+//            return CompletableFuture.completedFuture(ResponseEntity.ok(newCarDTOAndBrand));
+//
+//        } catch (IllegalArgumentException e) {
+//            // Error por Id ya existente.
+//            log.error(e.getMessage());
+//            return CompletableFuture.completedFuture(ResponseEntity
+//                    .status(HttpStatus.CONFLICT).body(e.getMessage()));
+//
+//        } catch (Exception e){
+//            log.error("Error while adding new car");
+//            return CompletableFuture.completedFuture(ResponseEntity
+//                    .status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+//        }
     }
 
     @PostMapping("add-bunch")
@@ -90,26 +118,43 @@ public class CarController {
     }
 
     @PutMapping("update-car/{id}")
-        public ResponseEntity<?> updateCarById(@PathVariable Integer id, @RequestBody CarDTO carDto){
+        public CompletableFuture<?> updateCarById(@PathVariable Integer id, @RequestBody CarDTO carDto){
 
-        try {
-            // Mapear carDTO a Car y llamada al método updateCarById
-            Car car = CarDTOMapper.INSTANCE.carDTOToCar(carDto);
-            Car carToUpdate = carService.updateCarById(id, car);
+        return CompletableFuture.supplyAsync(() -> CarDTOMapper.INSTANCE.carDTOToCar(carDto))
+                .thenCompose(car -> carService.updateCarById(id, car))
+                .thenApply(CarDTOAndBrandMapper.INSTANCE::carToCarDTOAndBrand)
+                .thenApply(updatedCar -> {
+                    log.info("Car updated");
+                    return ResponseEntity.status(HttpStatus.OK).body(updatedCar);
+                })
+                .exceptionally(throwable -> {
+                    if(throwable instanceof IllegalArgumentException){
+                        log.error(throwable.getMessage());
+                        return ResponseEntity.status(HttpStatus.CONFLICT).build();
+                    } else {
+                        log.error(throwable.getMessage());
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                    }
+                });
 
-            // Mapear Car a CarDTO y devolver CarDTO actualizado
-            CarDTOAndBrand carUpdated = CarDTOAndBrandMapper.INSTANCE.carToCarDTOAndBrand(carToUpdate);
-            log.info("Car updated");
-            return ResponseEntity.ok(carUpdated);
-
-        } catch (IllegalArgumentException e) {  // Error en la id pasada
-            log.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-
-        } catch (Exception e){
-            log.error("Error while updating car");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+//        try {
+//            // Mapear carDTO a Car y llamada al método updateCarById
+//            Car car = CarDTOMapper.INSTANCE.carDTOToCar(carDto);
+//            Car carToUpdate = carService.updateCarById(id, car);
+//
+//            // Mapear Car a CarDTO y devolver CarDTO actualizado
+//            CarDTOAndBrand carUpdated = CarDTOAndBrandMapper.INSTANCE.carToCarDTOAndBrand(carToUpdate);
+//            log.info("Car updated");
+//            return ResponseEntity.ok(carUpdated);
+//
+//        } catch (IllegalArgumentException e) {  // Error en la id pasada
+//            log.error(e.getMessage());
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+//
+//        } catch (Exception e){
+//            log.error("Error while updating car");
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//        }
 
     }
 

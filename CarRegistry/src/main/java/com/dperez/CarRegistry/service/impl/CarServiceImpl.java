@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -30,8 +29,9 @@ import java.util.stream.Collectors;
     private BrandRepository brandRepository;
 
 
+    @Async("taskExecutor")
     @Override
-    public Car addCar(Car car) throws IllegalArgumentException {
+    public CompletableFuture<Car> addCar(Car car) throws IllegalArgumentException {
 
         // Verifica si la Id ya existe. Lanza una excepción en caso afirmativo.
         if(car.getId() != null && carRepository.existsById(car.getId())){
@@ -60,8 +60,11 @@ import java.util.stream.Collectors;
         // Se guarda la CarEntity en la base de datos
         CarEntity savedCarEntity = carRepository.save(carEntity);
 
-        // Se devuelve el coche guardado como modelo de dominio
-        return CarEntityMapper.INSTANCE.carEntityToCar(savedCarEntity);
+        // Se guarda el coche guardado como modelo de dominio y se transforma en Car
+        Car savedCar = CarEntityMapper.INSTANCE.carEntityToCar(savedCarEntity);
+
+        // Se devuelve el coche guardado
+        return CompletableFuture.completedFuture(savedCar);
     }
 
     @Async("taskExecutor")
@@ -111,9 +114,9 @@ import java.util.stream.Collectors;
         return carEntityOptional.map(CarEntityMapper.INSTANCE::carEntityToCar).orElse(null);
     }
 
-
+    @Async("taskExecutor")
     @Override
-    public Car updateCarById(Integer id, Car car) throws IllegalArgumentException {
+    public CompletableFuture<Car> updateCarById(Integer id, Car car) throws IllegalArgumentException {
 
         // Verifica si la Marca del objeto Car existe
         Optional<BrandEntity> brandEntityOptional = brandRepository.findByNameIgnoreCase(car.getBrand().getName());
@@ -140,7 +143,7 @@ import java.util.stream.Collectors;
 
             // Actualiza los datos y devuelve el objeto actualizado.
             CarEntity updatedCarEntity = carRepository.save(carEntity);
-            return CarEntityMapper.INSTANCE.carEntityToCar(updatedCarEntity);
+            return CompletableFuture.completedFuture(CarEntityMapper.INSTANCE.carEntityToCar(updatedCarEntity));
         }
 
     }
