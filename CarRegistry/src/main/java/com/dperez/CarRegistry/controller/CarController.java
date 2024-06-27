@@ -57,8 +57,8 @@ public class CarController {
 //            // Cuando se guarda se devuelve en newCarDTO  y se muestra la respuesta
 //            Car car = CarDTOMapper.INSTANCE.carDTOToCar(carDTO);
 //
-//            Car newCar = carService.addCar(car);
-//            CarDTOAndBrand newCarDTOAndBrand = CarDTOAndBrandMapper.INSTANCE.carToCarDTOAndBrand(newCar);
+//            CompletableFuture<Car> newCar = carService.addCar(car);
+//            CarDTOAndBrand newCarDTOAndBrand = CarDTOAndBrandMapper.INSTANCE.carToCarDTOAndBrand(newCar.get());
 //            log.info("New Car added");
 //            return CompletableFuture.completedFuture(ResponseEntity.ok(newCarDTOAndBrand));
 //
@@ -120,41 +120,43 @@ public class CarController {
     @PutMapping("update-car/{id}")
         public CompletableFuture<?> updateCarById(@PathVariable Integer id, @RequestBody CarDTO carDto){
 
-        return CompletableFuture.supplyAsync(() -> CarDTOMapper.INSTANCE.carDTOToCar(carDto))
-                .thenCompose(car -> carService.updateCarById(id, car))
-                .thenApply(CarDTOAndBrandMapper.INSTANCE::carToCarDTOAndBrand)
-                .thenApply(updatedCar -> {
-                    log.info("Car updated");
-                    return ResponseEntity.status(HttpStatus.OK).body(updatedCar);
-                })
-                .exceptionally(throwable -> {
-                    if(throwable instanceof IllegalArgumentException){
-                        log.error(throwable.getMessage());
-                        return ResponseEntity.status(HttpStatus.CONFLICT).build();
-                    } else {
-                        log.error(throwable.getMessage());
-                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-                    }
-                });
+//        return CompletableFuture.supplyAsync(() -> CarDTOMapper.INSTANCE.carDTOToCar(carDto))
+//                .thenCompose(car -> carService.updateCarById(id, car))
+//                .thenApply(CarDTOAndBrandMapper.INSTANCE::carToCarDTOAndBrand)
+//                .thenApply(updatedCar -> {
+//                    log.info("Car updated");
+//                    return ResponseEntity.status(HttpStatus.OK).body(updatedCar);
+//                })
+//                .exceptionally(throwable -> {
+//                    if(throwable instanceof IllegalArgumentException){
+//                        log.error(throwable.getMessage());
+//                        return ResponseEntity.status(HttpStatus.CONFLICT).build();
+//                    } else {
+//                        log.error(throwable.getMessage());
+//                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+//                    }
+//                });
 
-//        try {
-//            // Mapear carDTO a Car y llamada al método updateCarById
-//            Car car = CarDTOMapper.INSTANCE.carDTOToCar(carDto);
-//            Car carToUpdate = carService.updateCarById(id, car);
-//
-//            // Mapear Car a CarDTO y devolver CarDTO actualizado
-//            CarDTOAndBrand carUpdated = CarDTOAndBrandMapper.INSTANCE.carToCarDTOAndBrand(carToUpdate);
-//            log.info("Car updated");
-//            return ResponseEntity.ok(carUpdated);
-//
-//        } catch (IllegalArgumentException e) {  // Error en la id pasada
-//            log.error(e.getMessage());
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-//
-//        } catch (Exception e){
-//            log.error("Error while updating car");
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-//        }
+        try {
+            // Mapear carDTO a Car y llamada al método updateCarById que devuelve un CompletableFuture<Car>
+            Car car = CarDTOMapper.INSTANCE.carDTOToCar(carDto);
+            CompletableFuture<Car> carToUpdate = carService.updateCarById(id, car);
+
+            // Mapear Car a CarDTO y devolver CarDTO actualizado
+            CarDTOAndBrand carUpdated = CarDTOAndBrandMapper.INSTANCE.carToCarDTOAndBrand(carToUpdate.get());
+            log.info("Car updated");
+            return CompletableFuture.completedFuture(ResponseEntity.ok(carUpdated));
+
+        } catch (IllegalArgumentException e) {  // Error en la id pasada
+            log.error(e.getMessage());
+            return CompletableFuture.completedFuture(ResponseEntity
+                    .status(HttpStatus.NOT_FOUND).body(e.getMessage()));
+
+        } catch (Exception e){
+            log.error("Error while updating car");
+            return CompletableFuture.completedFuture(ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+        }
 
     }
 

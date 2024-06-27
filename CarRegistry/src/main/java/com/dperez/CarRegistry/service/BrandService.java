@@ -7,13 +7,13 @@ import java.util.concurrent.CompletableFuture;
 
 public interface BrandService {
 
-    Brand addBrand (Brand brand) throws IllegalArgumentException;
+    Brand addBrand (Brand brand);
 
     CompletableFuture<List<Brand>> addBunchBrands(List<Brand> brands);
 
     Brand getBrandById (Integer id);
 
-    Brand updateBrandById (Integer id, Brand brand);
+    Brand updateBrandByName (String brandName, Brand brand);
 
     CompletableFuture<List<Brand>> updateBunchBrands (List<Brand> brands);
 

@@ -13,8 +13,8 @@ import java.util.Optional;
 public interface BrandRepository extends JpaRepository<BrandEntity, Integer> {
 
     // Busca los nombres de las marcas de coche y las convierte a minúsculas
-   // @Query("SELECT b FROM BrandEntity b WHERE LOWER(b.name) = LOWER(:name)")
-    @Query("SELECT DISTINCT b FROM BrandEntity b LEFT JOIN FETCH b.cars WHERE LOWER(b.name) = LOWER(:name)")
+    @Query("SELECT b FROM BrandEntity b WHERE LOWER(b.name) = LOWER(:name)")
+   // @Query("SELECT DISTINCT b FROM BrandEntity b LEFT JOIN FETCH b.cars WHERE LOWER(b.name) = LOWER(:name)")
     Optional<BrandEntity> findByNameIgnoreCase(@Param("name") String name);
 
 }
