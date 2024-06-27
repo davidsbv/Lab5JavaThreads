@@ -165,11 +165,15 @@ public class CarController {
         public CompletableFuture<ResponseEntity<?>> updateBunch(@RequestBody List<CarDTO> carDTOs){
 
         try {
+            // Mapeo de carDTOs a Car
             List<Car> cars = carDTOs.stream().map(CarDTOMapper.INSTANCE::carDTOToCar).toList();
+            // Llamada al método para actualizar un grupo de coches
+            // Cuando se completa la anterior instrucción, thenApply transforma car en carDTOAndBrand
             return carService.updateBunchCars(cars).thenApply(updatedCars -> {
                 List<CarDTOAndBrand> updatedCarDTOAndBrand = updatedCars.stream()
                         .map(CarDTOAndBrandMapper.INSTANCE::carToCarDTOAndBrand).toList();
 
+                // Se devuelven los CarDTOAndBrand Actualizados
                 log.info("Updating several cars");
                 return ResponseEntity.ok(updatedCarDTOAndBrand);
             });

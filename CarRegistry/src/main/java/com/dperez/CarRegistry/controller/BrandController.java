@@ -10,6 +10,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
 @Slf4j
 @RestController
 @RequestMapping("/brands")
@@ -18,7 +21,7 @@ public class BrandController {
     @Autowired
     private BrandService brandService;
 
-    @PostMapping("add-brand")
+    @PostMapping("add")
     public ResponseEntity<?> addBrand(@RequestBody BrandDTO brandDTO){
         try {
             Brand brand = BrandDTOMapper.INSTANCE.brandDTOToBrand(brandDTO);
@@ -38,7 +41,7 @@ public class BrandController {
         }
     }
 
-    @GetMapping("get-brand/{id}")
+    @GetMapping("get/{id}")
     public ResponseEntity<?> getBrandById(@PathVariable Integer id){
         try {
             Brand updatedBrand = brandService.getBrandById(id);
@@ -54,7 +57,7 @@ public class BrandController {
         }
     }
 
-    @PutMapping("update-brand/{brandName}")
+    @PutMapping("update/{brandName}")
     public ResponseEntity<?> updateBrandByName(@PathVariable String brandName, @RequestBody BrandDTO brandDTO){
 
         try {
@@ -70,7 +73,7 @@ public class BrandController {
         }
     }
 
-    @DeleteMapping("delete-brand/{id}")
+    @DeleteMapping("delete/{id}")
     public ResponseEntity<?> deleteBrandById(@PathVariable Integer id){
         if (id == null){
             log.error("No id");
@@ -81,4 +84,20 @@ public class BrandController {
             return ResponseEntity.status(HttpStatus.OK).body("Brand with id " + id + " deleted");
         }
     }
+
+    @GetMapping("get-all")
+    public CompletableFuture<ResponseEntity<?>> getAllBrands(){
+        CompletableFuture<List<Brand>> allBrands = brandService.getAllBrands();
+
+        return allBrands.thenApply(brands -> {
+             brands.stream().map(BrandDTOMapper.INSTANCE::brandToBrandDTO).toList();
+             // En caso de querer conservar el valor de la lista mapeada podemos utilizar las dos líneas comentadas
+//            List<BrandDTO> brandDTOS = brands.stream()
+//                    .map(BrandDTOMapper.INSTANCE::brandToBrandDTO).toList();
+            log.info("Recovering all Brands");
+            return ResponseEntity.status(HttpStatus.OK).body(brands);
+        });
+
+    }
+
 }

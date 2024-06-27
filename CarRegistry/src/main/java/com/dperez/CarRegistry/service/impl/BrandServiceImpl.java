@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -75,6 +76,9 @@ public class BrandServiceImpl implements BrandService {
 
     @Override
     public CompletableFuture<List<Brand>> updateBunchBrands(List<Brand> brands) {
+
+
+
         return null;
     }
 
@@ -92,6 +96,8 @@ public class BrandServiceImpl implements BrandService {
     @Async("taskExecutor")
     @Override
     public CompletableFuture<List<Brand>> getAllBrands() {
-        return null;
+        List<Brand> allBrands = brandRepository.findAll()
+                .stream().map(BrandEntityMapper.INSTANCE::brandEntityToBrand).toList();
+        return CompletableFuture.completedFuture(allBrands);
     }
 }
