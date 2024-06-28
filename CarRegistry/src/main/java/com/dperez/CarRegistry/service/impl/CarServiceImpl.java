@@ -93,7 +93,7 @@ import java.util.stream.Collectors;
         }).toList();
 
         long endTime = System.currentTimeMillis();
-        log.info("Total time: " + (endTime-starTime));
+        log.info("Total time: " + (endTime-starTime) + "ms");
 
         // Se devulven los coches guardados
         return CompletableFuture.completedFuture(addedCars);
@@ -183,7 +183,7 @@ import java.util.stream.Collectors;
         }).toList();
 
         long endTime = System.currentTimeMillis();
-        log.info("Total time: " + (endTime-starTime));
+        log.info("Total time: " + (endTime-starTime) + "ms");
 
         return CompletableFuture.completedFuture(updatedCars);
     }
@@ -211,7 +211,7 @@ import java.util.stream.Collectors;
                 .toList();
 
         long endTime = System.currentTimeMillis();
-        log.info("Total time: " + (endTime-starTime));
+        log.info("Total time: " + (endTime-starTime) + "ms");
 
         return CompletableFuture.completedFuture(allCars);
     }

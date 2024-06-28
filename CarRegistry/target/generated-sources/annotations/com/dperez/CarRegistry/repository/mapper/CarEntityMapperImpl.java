@@ -1,18 +1,14 @@
 package com.dperez.CarRegistry.repository.mapper;
 
 import com.dperez.CarRegistry.repository.entity.BrandEntity;
-import com.dperez.CarRegistry.repository.entity.BrandEntity.BrandEntityBuilder;
 import com.dperez.CarRegistry.repository.entity.CarEntity;
-import com.dperez.CarRegistry.repository.entity.CarEntity.CarEntityBuilder;
 import com.dperez.CarRegistry.service.model.Brand;
-import com.dperez.CarRegistry.service.model.Brand.BrandBuilder;
 import com.dperez.CarRegistry.service.model.Car;
-import com.dperez.CarRegistry.service.model.Car.CarBuilder;
 import javax.annotation.processing.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-06-25T16:55:51+0200",
+    date = "2024-06-28T16:40:36+0200",
     comments = "version: 1.4.2.Final, compiler: javac, environment: Java 17.0.8 (Oracle Corporation)"
 )
 public class CarEntityMapperImpl implements CarEntityMapper {
@@ -23,20 +19,20 @@ public class CarEntityMapperImpl implements CarEntityMapper {
             return null;
         }
 
-        CarBuilder car = Car.builder();
+        Car car = new Car();
 
-        car.id( carEntity.getId() );
-        car.brand( brandEntityToBrand( carEntity.getBrand() ) );
-        car.model( carEntity.getModel() );
-        car.mileage( carEntity.getMileage() );
-        car.price( carEntity.getPrice() );
-        car.year( carEntity.getYear() );
-        car.description( carEntity.getDescription() );
-        car.color( carEntity.getColor() );
-        car.fuelType( carEntity.getFuelType() );
-        car.numDoors( carEntity.getNumDoors() );
+        car.setId( carEntity.getId() );
+        car.setBrand( brandEntityToBrand( carEntity.getBrand() ) );
+        car.setModel( carEntity.getModel() );
+        car.setMileage( carEntity.getMileage() );
+        car.setPrice( carEntity.getPrice() );
+        car.setYear( carEntity.getYear() );
+        car.setDescription( carEntity.getDescription() );
+        car.setColor( carEntity.getColor() );
+        car.setFuelType( carEntity.getFuelType() );
+        car.setNumDoors( carEntity.getNumDoors() );
 
-        return car.build();
+        return car;
     }
 
     @Override
@@ -45,20 +41,20 @@ public class CarEntityMapperImpl implements CarEntityMapper {
             return null;
         }
 
-        CarEntityBuilder carEntity = CarEntity.builder();
+        CarEntity carEntity = new CarEntity();
 
-        carEntity.id( car.getId() );
-        carEntity.brand( brandToBrandEntity( car.getBrand() ) );
-        carEntity.model( car.getModel() );
-        carEntity.mileage( car.getMileage() );
-        carEntity.price( car.getPrice() );
-        carEntity.year( car.getYear() );
-        carEntity.description( car.getDescription() );
-        carEntity.color( car.getColor() );
-        carEntity.fuelType( car.getFuelType() );
-        carEntity.numDoors( car.getNumDoors() );
+        carEntity.setId( car.getId() );
+        carEntity.setBrand( brandToBrandEntity( car.getBrand() ) );
+        carEntity.setModel( car.getModel() );
+        carEntity.setMileage( car.getMileage() );
+        carEntity.setPrice( car.getPrice() );
+        carEntity.setYear( car.getYear() );
+        carEntity.setDescription( car.getDescription() );
+        carEntity.setColor( car.getColor() );
+        carEntity.setFuelType( car.getFuelType() );
+        carEntity.setNumDoors( car.getNumDoors() );
 
-        return carEntity.build();
+        return carEntity;
     }
 
     protected Brand brandEntityToBrand(BrandEntity brandEntity) {
@@ -66,14 +62,14 @@ public class CarEntityMapperImpl implements CarEntityMapper {
             return null;
         }
 
-        BrandBuilder brand = Brand.builder();
+        Brand brand = new Brand();
 
-        brand.id( brandEntity.getId() );
-        brand.name( brandEntity.getName() );
-        brand.warranty( brandEntity.getWarranty() );
-        brand.country( brandEntity.getCountry() );
+        brand.setId( brandEntity.getId() );
+        brand.setName( brandEntity.getName() );
+        brand.setWarranty( brandEntity.getWarranty() );
+        brand.setCountry( brandEntity.getCountry() );
 
-        return brand.build();
+        return brand;
     }
 
     protected BrandEntity brandToBrandEntity(Brand brand) {
@@ -81,13 +77,13 @@ public class CarEntityMapperImpl implements CarEntityMapper {
             return null;
         }
 
-        BrandEntityBuilder brandEntity = BrandEntity.builder();
+        BrandEntity brandEntity = new BrandEntity();
 
-        brandEntity.id( brand.getId() );
-        brandEntity.name( brand.getName() );
-        brandEntity.warranty( brand.getWarranty() );
-        brandEntity.country( brand.getCountry() );
+        brandEntity.setId( brand.getId() );
+        brandEntity.setName( brand.getName() );
+        brandEntity.setWarranty( brand.getWarranty() );
+        brandEntity.setCountry( brand.getCountry() );
 
-        return brandEntity.build();
+        return brandEntity;
     }
 }

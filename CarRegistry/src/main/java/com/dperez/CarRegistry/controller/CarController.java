@@ -47,6 +47,7 @@ public class CarController {
         }
     }
 
+    // Añadir lista de coches
     @PostMapping("add-bunch")
     public CompletableFuture<ResponseEntity<?>> addBunchCars(@RequestBody List<CarDTO> carDTOs){
 
@@ -113,7 +114,7 @@ public class CarController {
 
     }
 
-
+    // Actualizar lista de coches
     @PutMapping("update-bunch")
         public CompletableFuture<ResponseEntity<?>> updateBunch(@RequestBody List<CarDTO> carDTOs){
 
@@ -152,6 +153,7 @@ public class CarController {
         }
     }
 
+    // Recuperar la información de todos los coches
     @GetMapping("get-all")
     public CompletableFuture<ResponseEntity<?>> getAllCars(){
 
