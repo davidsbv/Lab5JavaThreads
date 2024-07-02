@@ -4,8 +4,10 @@ import com.dperez.CarRegistry.repository.entity.CarEntity;
 import com.dperez.CarRegistry.service.model.Car;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
+import org.springframework.stereotype.Component;
 
-@Mapper
+@Component
+@Mapper(componentModel = "spring")
 public interface CarEntityMapper {
 
     CarEntityMapper INSTANCE = Mappers.getMapper(CarEntityMapper.class);

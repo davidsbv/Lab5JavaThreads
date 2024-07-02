@@ -15,7 +15,7 @@ public class AsyncConfig {
         executor.setCorePoolSize(5); // Número mínimo de hilos concurrentes
         executor.setMaxPoolSize(10); // Número máximo de hilos
         executor.setQueueCapacity(500); // Capacidad de la cola de tareas
-        executor.setThreadNamePrefix("CarService-"); // Prefijo de los nombres de los hilos
+        executor.setThreadNamePrefix("CarRegistryThread-"); // Prefijo de los nombres de los hilos
         executor.initialize();
         return executor;
     }
